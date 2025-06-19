@@ -1,48 +1,80 @@
 import { useState } from 'react'
 import './App.css'
 
-function App () {
-  const [tablero, setTablero] = useState(
-    Array(8)
-      .fill(null)
-      .map(() =>
-        Array(8)
-          .fill(null)
-          .map(() => ({
-            esMina: false,
-            revelada: false,
-            adjacentes: 0
-          }))
-      )
+const FILAS = 8
+const COLUMNAS = 8
+const MINAS = 15
+
+function crearTableroVacio (filas, columnas) {
+  return Array(filas).fill(null).map(() =>
+    Array(columnas).fill(null).map(() => ({
+      esMina: false,
+      revelada: false,
+      adjacentes: 0
+    }))
   )
-  const [minas, setMinas] = useState(10)
-  const min = 0
-  const max = 8
+}
 
-  function colocarMinas (tablero) {
-    const newTablero = tablero.map((row) => [...row])
-
-    for (let i = 0; i < minas; i++) {
-      const fila = Math.floor(Math.random() * (max - min) + min)
-      const col = Math.floor(Math.random() * (max - min) + min)
-      if (!newTablero[fila][col].esMina) {
-        newTablero[fila][col].esMina = true
-      } else {
-        i--
-      }
+function colocarMinas (tablero, minas) {
+  const filas = tablero.length
+  const columnas = tablero[0].length
+  let minasColocadas = 0
+  while (minasColocadas < minas) {
+    const i = Math.floor(Math.random() * filas)
+    const j = Math.floor(Math.random() * columnas)
+    if (!tablero[i][j].esMina) {
+      tablero[i][j].esMina = true
+      minasColocadas++
     }
-    setTablero(newTablero)
-    console.log(tablero)
   }
+  return tablero
+}
 
-  function handleClick () {
-    colocarMinas(tablero)
+function contarMinasAdyacentes (tablero) {
+  const filas = tablero.length
+  const columnas = tablero[0].length
+  for (let i = 0; i < filas; i++) {
+    for (let j = 0; j < columnas; j++) {
+      if (tablero[i][j].esMina) continue
+      let contador = 0
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+          if (dx === 0 && dy === 0) continue
+          const ni = i + dx
+          const nj = j + dy
+          if (
+            ni >= 0 && ni < filas &&
+            nj >= 0 && nj < columnas &&
+            tablero[ni][nj].esMina
+          ) {
+            contador++
+          }
+        }
+      }
+      tablero[i][j].adjacentes = contador
+    }
   }
+  return tablero
+}
+
+function inicializarTablero (filas, columnas, minas) {
+  let tablero = crearTableroVacio(filas, columnas)
+  tablero = colocarMinas(tablero, minas)
+  tablero = contarMinasAdyacentes(tablero)
+  return tablero
+}
+
+function App () {
+  const [tablero, setTablero] = useState(() =>
+    inicializarTablero(FILAS, COLUMNAS, MINAS)
+  )
 
   function revelarCasilla (fila, col) {
-    const newTablero = tablero.map((row) => row.map((c) => ({ ...c })))
-    newTablero[fila][col].revelada = true
-    setTablero(newTablero)
+    const nuevoTablero = tablero.map(f =>
+      f.map(c => ({ ...c }))
+    )
+    nuevoTablero[fila][col].revelada = true
+    setTablero(nuevoTablero)
   }
 
   return (
@@ -51,15 +83,15 @@ function App () {
         <h1>Buscaminas</h1>
         <p>¡Encuentra todas las minas sin hacerlas explotar!</p>
       </header>
-      <button onClick={handleClick}>Iniciar</button>
-      <div className="tablero">
+      <div className='tablero'>
         {tablero.map((fila, filaIndex) => (
-          <div key={filaIndex} className="fila">
+          <div className='fila' key={filaIndex}>
             {fila.map((casilla, casIndex) => (
               <div
                 key={casIndex}
                 onClick={() => revelarCasilla(filaIndex, casIndex)}
                 className={`casilla ${casilla.revelada ? 'mostrar' : 'oculta'}`}
+                data-minas={casilla.adjacentes || undefined}
               >
                 {casilla.revelada
                   ? casilla.esMina
