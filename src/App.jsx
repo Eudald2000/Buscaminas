@@ -1,18 +1,19 @@
 import { useState } from 'react'
 import './App.css'
-
-const FILAS = 8
-const COLUMNAS = 8
-const MINAS = 15
+import { Modal } from './components/Modal'
 
 function crearTableroVacio (filas, columnas) {
-  return Array(filas).fill(null).map(() =>
-    Array(columnas).fill(null).map(() => ({
-      esMina: false,
-      revelada: false,
-      adjacentes: 0
-    }))
-  )
+  return Array(filas)
+    .fill(null)
+    .map(() =>
+      Array(columnas)
+        .fill(null)
+        .map(() => ({
+          esMina: false,
+          revelada: false,
+          adjacentes: 0
+        }))
+    )
 }
 
 function colocarMinas (tablero, minas) {
@@ -43,8 +44,10 @@ function contarMinasAdyacentes (tablero) {
           const ni = i + dx
           const nj = j + dy
           if (
-            ni >= 0 && ni < filas &&
-            nj >= 0 && nj < columnas &&
+            ni >= 0 &&
+            ni < filas &&
+            nj >= 0 &&
+            nj < columnas &&
             tablero[ni][nj].esMina
           ) {
             contador++
@@ -65,27 +68,93 @@ function inicializarTablero (filas, columnas, minas) {
 }
 
 function App () {
-  const [tablero, setTablero] = useState(() =>
-    inicializarTablero(FILAS, COLUMNAS, MINAS)
-  )
+  const [tablero, setTablero] = useState(null)
+  const [modal, setModal] = useState('inicio')
+  const [form, setForm] = useState({
+    filas: 0,
+    columnas: 0,
+    minas: 0
+  })
 
   function revelarCasilla (fila, col) {
-    const nuevoTablero = tablero.map(f =>
-      f.map(c => ({ ...c }))
-    )
+    const nuevoTablero = tablero.map((f) => f.map((c) => ({ ...c })))
     nuevoTablero[fila][col].revelada = true
     setTablero(nuevoTablero)
+    if (nuevoTablero[fila][col].esMina === true) {
+      setModal('derrota')
+    }
+    if (comprobarVictoria(nuevoTablero)) {
+      setModal('victoria')
+    }
   }
 
+  function comprobarVictoria (tablero) {
+    for (const fila of tablero) {
+      for (const casilla of fila) {
+        if (!casilla.esMina && !casilla.revelada) {
+          return false
+        }
+      }
+    }
+    return true
+  }
+
+  function handleSubmit (e) {
+    e.preventDefault()
+    setTablero(inicializarTablero(form.filas, form.columnas, form.minas))
+    setModal(null)
+  }
+
+  function restartGame () {
+    setTablero(null)
+    setModal('inicio')
+    setForm({
+      filas: 0,
+      columnas: 0,
+      minas: 0
+    })
+  }
   return (
     <>
       <header className="header">
         <h1>Buscaminas</h1>
         <p>¡Encuentra todas las minas sin hacerlas explotar!</p>
       </header>
-      <div className='tablero'>
-        {tablero.map((fila, filaIndex) => (
-          <div className='fila' key={filaIndex}>
+      {modal === 'inicio' && (
+        <Modal titulo={'INTRODUCE LOS DATOS'}>
+          <form>
+            <input
+              onChange={(e) =>
+                setForm({ ...form, filas: Number(e.target.value) })
+              }
+              placeholder="Introduce las filas"
+              type="number"
+            />
+            <input
+              onChange={(e) =>
+                setForm({ ...form, columnas: Number(e.target.value) })
+              }
+              placeholder="Introduce las columnas"
+              type="number"
+            />
+            <input
+              onChange={(e) =>
+                setForm({ ...form, minas: Number(e.target.value) })
+              }
+              placeholder="Introduce el numero de minas"
+              type="number"
+            />
+            <button onClick={handleSubmit} type='submit'>
+              Crear tablero
+            </button>
+          </form>
+        </Modal>
+      )}
+      <div className="tablero">
+        {
+        tablero && (
+          tablero.map((fila, filaIndex) => (
+          <div className="fila" key={filaIndex}>
             {fila.map((casilla, casIndex) => (
               <div
                 key={casIndex}
@@ -101,8 +170,21 @@ function App () {
               </div>
             ))}
           </div>
-        ))}
+          )))
+      }
       </div>
+      {modal === 'victoria' && (
+        <Modal titulo="¡Victoria!">
+          <h2>Has ganado</h2>
+          <button onClick={restartGame}>Jugar de nuevo</button>
+        </Modal>
+      )}
+      {modal === 'derrota' && (
+        <Modal titulo={'¡Derrota!'}>
+          <h2>Has explotado</h2>
+          <button onClick={restartGame}>Intentar de nuevo</button>
+        </Modal>
+      )}
     </>
   )
 }
