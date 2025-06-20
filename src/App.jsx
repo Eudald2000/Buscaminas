@@ -70,6 +70,7 @@ function inicializarTablero (filas, columnas, minas) {
 function App () {
   const [tablero, setTablero] = useState(null)
   const [modal, setModal] = useState('inicio')
+  const [error, setError] = useState('')
   const [form, setForm] = useState({
     filas: 0,
     columnas: 0,
@@ -78,13 +79,56 @@ function App () {
 
   function revelarCasilla (fila, col) {
     const nuevoTablero = tablero.map((f) => f.map((c) => ({ ...c })))
-    nuevoTablero[fila][col].revelada = true
+    if (nuevoTablero[fila][col].adjacentes === 0 && !nuevoTablero[fila][col].esMina) {
+      revelarEnCascada(nuevoTablero, fila, col)
+    } else {
+      nuevoTablero[fila][col].revelada = true
+    }
     setTablero(nuevoTablero)
     if (nuevoTablero[fila][col].esMina === true) {
+      nuevoTablero.forEach(filaArr => {
+        filaArr.forEach(casilla => {
+          if (casilla.esMina) {
+            casilla.revelada = true
+          }
+        })
+      })
+      setTablero(nuevoTablero)
       setModal('derrota')
+      return
     }
     if (comprobarVictoria(nuevoTablero)) {
       setModal('victoria')
+    }
+  }
+
+  function revelarEnCascada (tablero, fila, col) {
+    const filas = tablero.length
+    const columnas = tablero[0].length
+    const stack = [[fila, col]] // inicialmente solo la casilla pulsada
+
+    while (stack.length) {
+      const [i, j] = stack.pop()
+
+      // 1. Fuera del tablero
+      if (i < 0 || i >= filas || j < 0 || j >= columnas) continue
+
+      // 2. Mina
+      if (tablero[i][j].revelada || tablero[i][j].esMina) continue
+
+      tablero[i][j].revelada = true
+
+      // 4. Si es vacía, añadimos sus 8 vecinas a la pila
+      if (tablero[i][j].adjacentes === 0) {
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dy = -1; dy <= 1; dy++) {
+            if (dx !== 0 || dy !== 0) {
+              stack.push([i + dx, j + dy])
+            }
+          }
+        }
+      }
+    // Si tiene número, la revelamos pero no expandimos más
     }
   }
 
@@ -101,7 +145,20 @@ function App () {
 
   function handleSubmit (e) {
     e.preventDefault()
+    if (form.filas * form.columnas <= form.minas) {
+      setError('¡Debe haber más casillas que minas!')
+      return
+    }
+    if (form.filas > 50) {
+      setError('El numero de filas ha de ser inferior a 50')
+      return
+    }
+    if (form.columnas > 50) {
+      setError('El numero de filas ha de ser inferior a 50')
+      return
+    }
     setTablero(inicializarTablero(form.filas, form.columnas, form.minas))
+    setError(null)
     setModal(null)
   }
 
@@ -122,6 +179,7 @@ function App () {
       </header>
       {modal === 'inicio' && (
         <Modal titulo={'INTRODUCE LOS DATOS'}>
+          {error && <p style={{ color: 'red', margin: 0 }}>{error}</p>}
           <form>
             <input
               onChange={(e) =>
