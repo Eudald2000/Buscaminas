@@ -7,7 +7,8 @@ function crearTableroVacio (filas, columnas) {
         .map(() => ({
           esMina: false,
           revelada: false,
-          adjacentes: 0
+          adjacentes: 0,
+          marcada: false
         }))
     )
 }

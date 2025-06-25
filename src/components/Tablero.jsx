@@ -1,6 +1,6 @@
 import { Fila } from './Fila'
 
-export const Tablero = ({ tablero, onRevelarCasilla }) => {
+export const Tablero = ({ tablero, onRevelarCasilla, onMarcarBandera }) => {
   return (
     <div className="tablero">
       {tablero.map((fila, filaIndex) => (
@@ -9,6 +9,7 @@ export const Tablero = ({ tablero, onRevelarCasilla }) => {
         fila={fila}
         filaIndex={filaIndex}
         onRevelarCasilla={onRevelarCasilla}
+        onMarcarBandera={onMarcarBandera}
         />
       ))}
     </div>

@@ -1,6 +1,6 @@
 import { Casilla } from './Casilla'
 
-export const Fila = ({ fila, filaIndex, onRevelarCasilla }) => {
+export const Fila = ({ fila, filaIndex, onRevelarCasilla, onMarcarBandera }) => {
   return (
     <div className="fila" key={filaIndex}>
       {fila.map((casilla, casIndex) => (
@@ -10,6 +10,7 @@ export const Fila = ({ fila, filaIndex, onRevelarCasilla }) => {
           filaIndex={filaIndex}
           casIndex={casIndex}
           onRevelarCasilla={onRevelarCasilla}
+          onMarcarBandera={onMarcarBandera}
         />
       ))}
     </div>

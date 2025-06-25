@@ -43,6 +43,14 @@ function App () {
     }
   }
 
+  function marcarCasilla (fila, col) {
+    const nuevoTablero = tablero.map(f => f.map(c => ({ ...c })))
+    if (!nuevoTablero[fila][col].revelada) {
+      nuevoTablero[fila][col].marcada = !nuevoTablero[fila][col].marcada
+      setTablero(nuevoTablero)
+    }
+  }
+
   function handleSubmit (e) {
     e.preventDefault()
     if (form.filas * form.columnas <= form.minas) {
@@ -107,7 +115,7 @@ function App () {
       )}
       {
       tablero && (
-        <Tablero tablero={tablero} onRevelarCasilla={revelarCasilla} />
+        <Tablero tablero={tablero} onRevelarCasilla={revelarCasilla} onMarcarBandera={marcarCasilla}/>
       )}
       {modal === 'victoria' && (
         <Modal titulo="¡Victoria!">
