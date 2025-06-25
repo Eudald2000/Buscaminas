@@ -1,36 +1,33 @@
-1. Diseño del tablero
-Crea una matriz bidimensional para representar el tablero (ya lo tienes).
-Decide el tamaño del tablero y el número de minas.
-2. Colocación de minas
-Al iniciar el juego, coloca aleatoriamente las minas en el tablero.
-Guarda la información de si una casilla tiene mina o no.
-3. Cálculo de números
-Para cada casilla sin mina, calcula cuántas minas hay en las casillas adyacentes (números del 1 al 8).
-4. Estructura de datos de cada casilla
-Cada casilla debe tener:
-Si tiene mina (isMine)
-Si está descubierta (isRevealed)
-Si está marcada con bandera (isFlagged)
-Número de minas alrededor (adjacentMines)
-5. Renderizado del tablero
-Muestra cada casilla según su estado:
-Oculta
-Descubierta (número o mina)
-Marcada con bandera
-6. Lógica de clics
-Al hacer clic izquierdo:
-Si es mina, fin del juego.
-Si no, revela la casilla.
-Si es un 0, revela automáticamente las casillas adyacentes (efecto cascada).
-Al hacer clic derecho:
-Marca o desmarca la casilla con una bandera.
-7. Condiciones de victoria y derrota
-Derrota: el jugador revela una mina.
-Victoria: el jugador revela todas las casillas que no tienen mina.
-8. Reiniciar el juego
-Añade un botón para reiniciar el tablero y volver a colocar las minas.
-9. Mejoras opcionales
-Temporizador.
-Contador de banderas.
-Niveles de dificultad.
-Animaciones o efectos visuales.
+# Buscaminas (React)
+
+## Descripción
+Este proyecto es una versión interactiva del clásico juego Buscaminas, desarrollada con React. El objetivo es descubrir todas las casillas que no contienen minas, evitando detonar alguna. Puedes personalizar el tamaño del tablero y el número de minas antes de empezar cada partida.
+
+---
+
+## ¿Cómo funciona el juego?
+- Al iniciar, aparece un formulario donde puedes elegir el número de filas, columnas y minas.
+- El tablero se genera aleatoriamente según los parámetros introducidos.
+- Haz clic izquierdo en una casilla para revelarla:
+  - Si es una mina, pierdes y se muestran todas las minas.
+  - Si no es mina y tiene minas adyacentes, se muestra el número de minas cercanas.
+  - Si no es mina y no tiene minas adyacentes, se revelan automáticamente todas las casillas vacías conectadas (efecto cascada).
+- Ganas la partida si revelas todas las casillas que no son minas.
+- El juego muestra un mensaje de victoria o derrota en un modal reutilizable.
+
+---
+
+## Estructura de datos de cada casilla
+Cada casilla contiene:
+- **isMine**: ¿Es una mina?
+- **isRevealed**: ¿Está descubierta?
+- **isFlagged**: ¿Está marcada con bandera?
+- **adjacentMines**: Número de minas alrededor
+
+---
+
+## Cómo jugar
+1. Introduce el número de filas, columnas y minas en el formulario inicial.
+2. Haz clic en una casilla para descubrirla.
+3. Si descubres una mina, pierdes la partida y se muestran todas las minas.
+4. Si descubres todas las casillas que no son minas, ¡ganas!
