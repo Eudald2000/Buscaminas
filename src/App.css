@@ -68,13 +68,14 @@
 }
 
 .header {
-  text-align: center;
   background: #414141;
   color: #fff;
   padding: 24px 0 12px 0;
   margin-bottom: 24px;
   border-radius: 12px;
   box-shadow: 0 2px 8px;
+  text-align: center;
+  position: relative;
 }
 
 .header h1 {
@@ -83,10 +84,33 @@
   letter-spacing: 2px;
 }
 
-.header p {
-  margin: 8px 0 0 0;
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+  position: relative;
+}
+
+.header-row p {
+  flex: 1;
+  margin: 0;
   font-size: 1.1rem;
   color: #ddd;
+  text-align: center;
+}
+
+.header-row .tiempo {
+  min-width: 80px;
+  text-align: right;
+  color: #ffd600;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-left: auto;
+  padding: 4px 12px;
+  background: #222;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
 }
 
 .tablero{

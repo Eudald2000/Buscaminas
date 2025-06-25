@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import { Modal } from './components/Modal'
 import { Header } from './components/Header'
@@ -14,8 +14,22 @@ function App () {
     columnas: 0,
     minas: 0
   })
+  const [tiempo, setTiempo] = useState(0)
+  const [juegoIniciado, setJuegoIniciado] = useState(false)
+  const [juegoTerminado, setJuegoTerminado] = useState(false)
+  const intervaloRef = useRef(null)
+
+  useEffect(() => {
+    if (juegoIniciado && !juegoTerminado) {
+      intervaloRef.current = setInterval(() => {
+        setTiempo(t => t + 100)
+      }, 100)
+    }
+    return () => clearInterval(intervaloRef.current)
+  }, [juegoIniciado, juegoTerminado])
 
   function revelarCasilla (fila, col) {
+    if (!juegoIniciado) setJuegoIniciado(true)
     const nuevoTablero = tablero.map((f) => f.map((c) => ({ ...c })))
     if (
       nuevoTablero[fila][col].adjacentes === 0 &&
@@ -27,6 +41,7 @@ function App () {
     }
     setTablero(nuevoTablero)
     if (nuevoTablero[fila][col].esMina === true) {
+      setJuegoTerminado(true)
       nuevoTablero.forEach((filaArr) => {
         filaArr.forEach((casilla) => {
           if (casilla.esMina) {
@@ -39,6 +54,7 @@ function App () {
       return
     }
     if (comprobarVictoria(nuevoTablero)) {
+      setJuegoTerminado(true)
       setModal('victoria')
     }
   }
@@ -78,10 +94,13 @@ function App () {
       columnas: 0,
       minas: 0
     })
+    setTiempo(0)
+    setJuegoIniciado(false)
+    setJuegoTerminado(false)
   }
   return (
     <>
-      <Header />
+      <Header tiempo={tiempo} />
       {modal === 'inicio' && (
         <Modal titulo={'INTRODUCE LOS DATOS'}>
           {error && <p style={{ color: 'red', margin: 0 }}>{error}</p>}
